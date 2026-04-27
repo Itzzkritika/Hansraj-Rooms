@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin · Hansraj Rooms</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --blue: #1a56db; --blue-light: #e8f0fe;
+      --green: #0f7b3e; --green-light: #dcfce7;
+      --red: #c81e1e; --red-light: #fef2f2;
+      --gray-50: #f9fafb; --gray-100: #f3f4f6; --gray-200: #e5e7eb;
+      --gray-400: #9ca3af; --gray-600: #4b5563; --gray-800: #1f2937; --gray-900: #111827;
+      --radius: 10px; --shadow: 0 1px 3px rgba(0,0,0,0.08);
+    }
+    body { font-family: 'Inter', sans-serif; background: var(--gray-50); color: var(--gray-900); min-height: 100vh; }
+
+    header { background: #fff; border-bottom: 1px solid var(--gray-200); padding: 0 1.5rem; display: flex; align-items: center; justify-content: space-between; height: 60px; position: sticky; top: 0; z-index: 10; }
+    .logo { display: flex; align-items: center; gap: 10px; font-weight: 600; font-size: 15px; color: var(--gray-900); text-decoration: none; }
+    .logo-icon { width: 32px; height: 32px; background: var(--blue); border-radius: 8px; display: flex; align-items: center; justify-content: center; color: #fff; font-size: 16px; }
+
+    /* Login */
+    #login-screen { position: fixed; inset: 0; background: rgba(17,24,39,0.5); display: flex; align-items: center; justify-content: center; z-index: 100; }
+    .login-card { background: #fff; border-radius: 14px; padding: 2rem; width: 340px; box-shadow: 0 20px 60px rgba(0,0,0,0.15); }
+    .login-card h2 { font-size: 18px; font-weight: 600; margin-bottom: 4px; }
+    .login-card p { font-size: 13px; color: var(--gray-600); margin-bottom: 1.25rem; }
+
+    label { font-size: 12px; font-weight: 500; color: var(--gray-600); display: block; margin-bottom: 5px; text-transform: uppercase; letter-spacing: 0.04em; }
+    input[type="password"], input[type="text"], input[type="time"], select {
+      width: 100%; padding: 9px 12px; font-size: 14px; font-family: 'Inter', sans-serif;
+      border: 1px solid var(--gray-200); border-radius: 8px; background: var(--gray-50); color: var(--gray-900); outline: none;
+    }
+    input:focus, select:focus { border-color: var(--blue); background: #fff; }
+
+    .btn { padding: 10px 18px; font-size: 14px; font-weight: 500; font-family: 'Inter', sans-serif; border: none; border-radius: 8px; cursor: pointer; }
+    .btn-primary { background: var(--blue); color: #fff; }
+    .btn-primary:hover { opacity: 0.9; }
+    .btn-full { width: 100%; }
+    .btn-danger { background: var(--red-light); color: var(--red); border: 1px solid #fca5a5; font-size: 12px; padding: 4px 10px; border-radius: 6px; cursor: pointer; }
+    .btn-danger:disabled { opacity: 0.5; cursor: not-allowed; }
+    .error-msg { color: var(--red); font-size: 13px; margin-top: 8px; display: none; }
+
+    main { max-width: 860px; margin: 0 auto; padding: 2rem 1.5rem; }
+
+    .tabs { display: flex; gap: 2px; background: var(--gray-100); border-radius: 10px; padding: 4px; margin-bottom: 1.5rem; width: fit-content; }
+    .tab { font-size: 14px; font-weight: 500; padding: 7px 18px; border-radius: 7px; border: none; background: none; cursor: pointer; color: var(--gray-600); }
+    .tab.active { background: #fff; color: var(--gray-900); box-shadow: var(--shadow); }
+
+    .panel { display: none; }
+    .panel.active { display: block; }
+
+    .card { background: #fff; border: 1px solid var(--gray-200); border-radius: var(--radius); padding: 1.25rem; margin-bottom: 1rem; box-shadow: var(--shadow); }
+    .card-title { font-size: 15px; font-weight: 600; margin-bottom: 1rem; }
+
+    .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 12px; }
+    .form-grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; margin-bottom: 12px; }
+    .form-group { margin-bottom: 12px; }
+    @media(max-width:600px) { .form-grid, .form-grid-3 { grid-template-columns: 1fr; } }
+
+    .days-row { display: flex; gap: 6px; flex-wrap: wrap; }
+    .day-pill { padding: 5px 13px; border-radius: 99px; font-size: 13px; border: 1px solid var(--gray-200); cursor: pointer; background: var(--gray-50); color: var(--gray-600); user-select: none; }
+    .day-pill.sel { background: var(--blue); color: #fff; border-color: var(--blue); }
+
+    .list-row { display: flex; align-items: flex-start; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid var(--gray-100); gap: 10px; }
+    .list-row:last-child { border-bottom: none; }
+    .block-header { font-size: 11px; font-weight: 600; letter-spacing: 0.07em; text-transform: uppercase; color: var(--gray-400); margin: 12px 0 6px; }
+
+    .search-input { width: 100%; padding: 8px 12px; font-size: 13px; font-family: 'Inter', sans-serif; border: 1px solid var(--gray-200); border-radius: 8px; background: var(--gray-50); outline: none; margin-bottom: 12px; }
+    .search-input:focus { border-color: var(--blue); background: #fff; }
+
+    .toast { position: fixed; bottom: 1.5rem; left: 50%; transform: translateX(-50%) translateY(60px); background: var(--gray-900); color: #fff; padding: 10px 20px; border-radius: 99px; font-size: 13px; opacity: 0; transition: all 0.3s; z-index: 200; }
+    .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+    .toast.error { background: var(--red); }
+
+    .logout-btn { font-size: 13px; color: var(--gray-600); background: none; border: 1px solid var(--gray-200); border-radius: 8px; padding: 5px 12px; cursor: pointer; }
+    .spinner { display: inline-block; width: 14px; height: 14px; border: 2px solid #fff; border-top-color: transparent; border-radius: 50%; animation: spin 0.6s linear infinite; vertical-align: middle; margin-right: 6px; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .loading-overlay { text-align: center; padding: 2rem; color: var(--gray-400); font-size: 14px; }
+  </style>
+</head>
+<body>
+
+<div id="login-screen">
+  <div class="login-card">
+    <h2>Admin Login</h2>
+    <p>Manage class schedules for Hansraj College rooms.</p>
+    <div class="form-group">
+      <label>Password</label>
+      <input type="password" id="pwd-input" placeholder="Enter password" onkeydown="if(event.key==='Enter') doLogin()">
+    </div>
+    <button class="btn btn-primary btn-full" onclick="doLogin()">Login</button>
+    <p class="error-msg" id="login-error">Incorrect password. Try again.</p>
+  </div>
+</div>
+
+<header>
+  <a class="logo" href="index.html">
+    <div class="logo-icon">🏫</div>
+    Hansraj Rooms · Admin
+  </a>
+  <button class="logout-btn" onclick="doLogout()" id="logout-btn" style="display:none;">Logout</button>
+</header>
+
+<main id="admin-main" style="display:none;">
+  <div class="tabs">
+    <button class="tab active" onclick="switchPanel('schedules')">Schedules</button>
+    <button class="tab" onclick="switchPanel('rooms')">Rooms</button>
+  </div>
+
+  <!-- SCHEDULES -->
+  <div class="panel active" id="panel-schedules">
+    <div class="card">
+      <div class="card-title">Add a scheduled class</div>
+      <div class="form-grid">
+        <div><label>Room</label><select id="sched-room"></select></div>
+        <div><label>Subject / class name</label><input type="text" id="sched-subj" placeholder="e.g. Physics Lab"></div>
+      </div>
+      <div class="form-group">
+        <label>Days</label>
+        <div class="days-row" id="sched-days">
+          <span class="day-pill" onclick="toggleDay(this)">Mon</span>
+          <span class="day-pill" onclick="toggleDay(this)">Tue</span>
+          <span class="day-pill" onclick="toggleDay(this)">Wed</span>
+          <span class="day-pill" onclick="toggleDay(this)">Thu</span>
+          <span class="day-pill" onclick="toggleDay(this)">Fri</span>
+          <span class="day-pill" onclick="toggleDay(this)">Sat</span>
+        </div>
+      </div>
+      <div class="form-grid" style="margin-bottom:12px;">
+        <div><label>Start time</label><input type="time" id="sched-start" value="09:00"></div>
+        <div><label>End time</label><input type="time" id="sched-end" value="10:00"></div>
+      </div>
+      <button class="btn btn-primary" id="add-sched-btn" onclick="addSchedule()">Add Schedule</button>
+    </div>
+    <div class="card">
+      <div class="card-title">All scheduled classes (<span id="sched-count">0</span>)</div>
+      <input class="search-input" type="text" placeholder="Search by room or subject..." oninput="renderSchedules(this.value)">
+      <div id="sched-list"><div class="loading-overlay">Loading schedules...</div></div>
+    </div>
+  </div>
+
+  <!-- ROOMS -->
+  <div class="panel" id="panel-rooms">
+    <div class="card">
+      <div class="card-title">All rooms (<span id="room-count">0</span>)</div>
+      <input class="search-input" type="text" placeholder="Search rooms..." oninput="renderRooms(this.value)">
+      <div id="room-list"></div>
+    </div>
+  </div>
+</main>
+
+<div class="toast" id="toast"></div>
+
+<script src="data.js"></script>
+<script src="app.js"></script>
+<script>
+  function doLogin() {
+    const pwd = document.getElementById('pwd-input').value;
+    if (pwd === ADMIN_PASSWORD) {
+      document.getElementById('login-screen').style.display = 'none';
+      document.getElementById('admin-main').style.display = 'block';
+      document.getElementById('logout-btn').style.display = 'inline';
+      initAdmin();
+    } else {
+      document.getElementById('login-error').style.display = 'block';
+    }
+  }
+
+  function doLogout() {
+    document.getElementById('login-screen').style.display = 'flex';
+    document.getElementById('admin-main').style.display = 'none';
+    document.getElementById('pwd-input').value = '';
+  }
+
+  function switchPanel(name) {
+    document.querySelectorAll('.tab').forEach((t,i) => t.classList.toggle('active', ['schedules','rooms'][i] === name));
+    document.querySelectorAll('.panel').forEach((p,i) => p.classList.toggle('active', ['panel-schedules','panel-rooms'][i] === 'panel-'+name));
+  }
+
+  function showToast(msg, isError = false) {
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.classList.toggle('error', isError);
+    t.classList.add('show');
+    setTimeout(() => t.classList.remove('show'), 2500);
+  }
+
+  function toggleDay(el) { el.classList.toggle('sel'); }
+
+  async function initAdmin() {
+    schedules = await dbGetSchedules();
+    renderSchedRoomSelect();
+    renderRooms('');
+    renderSchedules('');
+  }
+
+  function renderSchedRoomSelect() {
+    document.getElementById('sched-room').innerHTML =
+      rooms.map(r => `<option value="${r.id}">${r.room} (${r.block})</option>`).join('');
+  }
+
+  function renderRooms(q) {
+    const el = document.getElementById('room-list');
+    const rc = document.getElementById('room-count');
+    const filtered = rooms.filter(r => r.room.toLowerCase().includes(q.toLowerCase()) || r.block.toLowerCase().includes(q.toLowerCase()));
+    rc.textContent = filtered.length;
+    const blocks = [...new Set(filtered.map(r => r.block))];
+    el.innerHTML = blocks.map(b => {
+      const br = filtered.filter(r => r.block === b);
+      return `<div class="block-header">${b}</div>` +
+        br.map(r => `<div class="list-row">
+          <span><strong>${r.room}</strong> <span style="color:var(--gray-400);font-size:12px;">· ${r.cap} seats</span></span>
+        </div>`).join('');
+    }).join('');
+  }
+
+  async function addSchedule() {
+    const roomId  = document.getElementById('sched-room').value;
+    const subject = document.getElementById('sched-subj').value.trim();
+    const days    = [...document.querySelectorAll('#sched-days .day-pill.sel')].map(e => e.textContent);
+    const start   = document.getElementById('sched-start').value;
+    const end     = document.getElementById('sched-end').value;
+
+    if (!subject) { showToast('Enter a subject name.', true); return; }
+    if (!days.length) { showToast('Select at least one day.', true); return; }
+    const toMins = t => { const [h,m] = t.split(':').map(Number); return h*60+m; };
+    if (toMins(start) >= toMins(end)) { showToast('End time must be after start time.', true); return; }
+
+    const btn = document.getElementById('add-sched-btn');
+    btn.innerHTML = '<span class="spinner"></span>Saving...';
+    btn.disabled = true;
+
+    const newS = { id: 's' + Date.now(), roomId, subject, days, start, end };
+    const ok = await dbAddSchedule(newS);
+
+    btn.innerHTML = 'Add Schedule';
+    btn.disabled = false;
+
+    if (ok) {
+      schedules.push(newS);
+      document.getElementById('sched-subj').value = '';
+      document.querySelectorAll('#sched-days .day-pill').forEach(e => e.classList.remove('sel'));
+      renderSchedules('');
+      showToast('✓ Schedule saved for everyone!');
+    } else {
+      showToast('Failed to save. Check your connection.', true);
+    }
+  }
+
+  async function deleteSchedule(id, btn) {
+    btn.disabled = true;
+    btn.textContent = '...';
+    const ok = await dbDeleteSchedule(id);
+    if (ok) {
+      schedules = schedules.filter(s => s.id !== id);
+      renderSchedules('');
+      showToast('Schedule removed.');
+    } else {
+      showToast('Failed to delete.', true);
+      btn.disabled = false;
+      btn.textContent = 'Remove';
+    }
+  }
+
+  function renderSchedules(q = '') {
+    const el = document.getElementById('sched-list');
+    const sc = document.getElementById('sched-count');
+    const filtered = schedules.filter(s => {
+      const r = rooms.find(r => r.id === s.roomId);
+      return s.subject.toLowerCase().includes(q.toLowerCase()) || (r && r.room.toLowerCase().includes(q.toLowerCase()));
+    });
+    sc.textContent = filtered.length;
+    if (!filtered.length) {
+      el.innerHTML = '<p style="color:var(--gray-400);font-size:13px;padding:1rem 0;">No schedules yet. Add one above.</p>';
+      return;
+    }
+    el.innerHTML = filtered.map(s => {
+      const r = rooms.find(r => r.id === s.roomId);
+      return `<div class="list-row">
+        <div>
+          <div style="font-weight:500;font-size:14px;">${s.subject}</div>
+          <div style="font-size:12px;color:var(--gray-600);margin-top:3px;">${r ? r.room : '?'} &nbsp;·&nbsp; ${s.days.join(', ')} &nbsp;·&nbsp; ${s.start}–${s.end}</div>
+        </div>
+        <button class="btn-danger" onclick="deleteSchedule('${s.id}', this)">Remove</button>
+      </div>`;
+    }).join('');
+  }
+</script>
+</body>
+</html>

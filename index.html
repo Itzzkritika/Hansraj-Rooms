@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Hansraj College · Empty Classroom Finder</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --blue: #1a56db; --blue-light: #e8f0fe;
+      --green: #0f7b3e; --green-light: #dcfce7;
+      --red: #c81e1e; --red-light: #fef2f2;
+      --gray-50: #f9fafb; --gray-100: #f3f4f6; --gray-200: #e5e7eb;
+      --gray-400: #9ca3af; --gray-600: #4b5563; --gray-900: #111827;
+      --radius: 10px; --shadow: 0 1px 3px rgba(0,0,0,0.08);
+    }
+    body { font-family: 'Inter', sans-serif; background: var(--gray-50); color: var(--gray-900); min-height: 100vh; }
+
+    header {
+      background: #fff; border-bottom: 1px solid var(--gray-200);
+      padding: 0 1.5rem; display: flex; align-items: center;
+      justify-content: space-between; height: 60px; position: sticky; top: 0; z-index: 10;
+    }
+    .logo { display: flex; align-items: center; gap: 10px; font-weight: 600; font-size: 15px; color: var(--gray-900); text-decoration: none; }
+    .logo-icon { width: 32px; height: 32px; background: var(--blue); border-radius: 8px; display: flex; align-items: center; justify-content: center; color: #fff; font-size: 16px; }
+    .admin-link { font-size: 13px; color: var(--gray-600); text-decoration: none; padding: 6px 14px; border: 1px solid var(--gray-200); border-radius: 8px; }
+    .admin-link:hover { background: var(--gray-100); }
+
+    main { max-width: 800px; margin: 0 auto; padding: 2rem 1.5rem; }
+    .hero { text-align: center; margin-bottom: 2rem; }
+    .hero h1 { font-size: 26px; font-weight: 600; margin-bottom: 6px; }
+    .hero p { font-size: 15px; color: var(--gray-600); }
+
+    .search-card { background: #fff; border: 1px solid var(--gray-200); border-radius: var(--radius); padding: 1.25rem; box-shadow: var(--shadow); margin-bottom: 1.5rem; }
+    .search-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; margin-bottom: 12px; }
+    @media(max-width:600px) { .search-grid { grid-template-columns: 1fr 1fr; } }
+
+    label { font-size: 12px; font-weight: 500; color: var(--gray-600); display: block; margin-bottom: 5px; text-transform: uppercase; letter-spacing: 0.04em; }
+    select, input[type="time"] { width: 100%; padding: 9px 12px; font-size: 14px; font-family: 'Inter', sans-serif; border: 1px solid var(--gray-200); border-radius: 8px; background: var(--gray-50); color: var(--gray-900); outline: none; }
+    select:focus, input:focus { border-color: var(--blue); background: #fff; }
+
+    .btn { width: 100%; padding: 11px; font-size: 15px; font-weight: 500; font-family: 'Inter', sans-serif; background: var(--blue); color: #fff; border: none; border-radius: 8px; cursor: pointer; }
+    .btn:hover { opacity: 0.9; }
+
+    .stat-box { background: #fff; border: 1px solid var(--gray-200); border-radius: var(--radius); padding: 14px 16px; text-align: center; }
+    .stat-num { font-size: 28px; font-weight: 600; color: var(--gray-900); }
+    .stat-label { font-size: 12px; color: var(--gray-600); margin-top: 2px; }
+    .stat-box.green .stat-num { color: var(--green); }
+    .stat-box.red .stat-num { color: var(--red); }
+
+    .block-section { margin-bottom: 1.25rem; }
+    .block-label { font-size: 11px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--gray-400); margin-bottom: 8px; }
+    .room-card { background: #fff; border: 1px solid var(--gray-200); border-radius: var(--radius); padding: 11px 16px; margin-bottom: 6px; display: flex; align-items: center; justify-content: space-between; }
+    .room-card:hover { box-shadow: var(--shadow); }
+    .room-name { font-size: 14px; font-weight: 500; }
+    .room-meta { font-size: 12px; color: var(--gray-600); margin-top: 2px; }
+    .badge { font-size: 11px; font-weight: 500; padding: 3px 10px; border-radius: 99px; }
+    .badge-free { background: var(--green-light); color: var(--green); }
+    .badge-busy { background: var(--red-light); color: var(--red); }
+    .section-divider { font-size: 11px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--gray-400); margin: 1rem 0 8px; }
+    .empty-state { text-align: center; padding: 3rem 1rem; color: var(--gray-600); }
+    .empty-state .icon { font-size: 36px; margin-bottom: 12px; }
+    .empty-state p { font-size: 15px; }
+
+    footer { text-align: center; padding: 2rem; font-size: 12px; color: var(--gray-400); }
+  </style>
+</head>
+<body>
+<header>
+  <a class="logo" href="index.html">
+    <div class="logo-icon">🏫</div>
+    Hansraj Rooms
+  </a>
+  <a class="admin-link" href="admin.html">Admin</a>
+</header>
+
+<main>
+  <div class="hero">
+    <h1>Find an empty classroom</h1>
+    <p>See which rooms are free right now at Hansraj College</p>
+  </div>
+
+  <div class="search-card">
+    <div class="search-grid">
+      <div>
+        <label>Day</label>
+        <select id="find-day">
+          <option>Monday</option><option>Tuesday</option><option>Wednesday</option>
+          <option>Thursday</option><option>Friday</option><option>Saturday</option>
+        </select>
+      </div>
+      <div>
+        <label>Time</label>
+        <input type="time" id="find-time" value="09:00">
+      </div>
+      <div>
+        <label>Block</label>
+        <select id="find-block">
+          <option value="">All blocks</option>
+          <option>Block A</option><option>Block B</option><option>Block C</option>
+        </select>
+      </div>
+    </div>
+    <button class="btn" onclick="findEmpty()">Search Empty Rooms</button>
+  </div>
+
+  <div id="results"></div>
+</main>
+
+<footer>Hansraj College · Delhi University &nbsp;·&nbsp; <a href="admin.html" style="color:inherit;">Admin Login</a></footer>
+
+<script src="data.js"></script>
+<script src="app.js"></script>
+<script>
+  window.addEventListener('DOMContentLoaded', () => {
+    const now = new Date();
+    const days = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+    const today = days[now.getDay()];
+    const daySelect = document.getElementById('find-day');
+    for (let opt of daySelect.options) { if (opt.value === today) { opt.selected = true; break; } }
+    const hh = String(now.getHours()).padStart(2,'0');
+    const mm = String(now.getMinutes()).padStart(2,'0');
+    document.getElementById('find-time').value = `${hh}:${mm}`;
+    findEmpty();
+  });
+</script>
+</body>
+</html>
