@@ -1,5 +1,5 @@
 // ─────────────────────────────────────────────
-//  ADMIN PASSWORD — change this!
+//  ADMIN PASSWORD
 // ─────────────────────────────────────────────
 const ADMIN_PASSWORD = 'hansraj2024';
 
@@ -7,46 +7,81 @@ const ADMIN_PASSWORD = 'hansraj2024';
 //  SUPABASE CONFIG
 // ─────────────────────────────────────────────
 const SUPABASE_URL = 'https://mznwuljzwwovoyytjmoq.supabase.co';
-const SUPABASE_KEY = 'sb_publishable_BEhdKS2W8scluJwOKVO2iA_wrJ9dkI8';
+const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im16bnd1bGp6d3dvdm95eXRqbW9xIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzcyNzU0NDgsImV4cCI6MjA5Mjg1MTQ0OH0.DK5a_6NV-b2xgvCc66UFP8ZTDtdjzcYmxUj9MZUvJog';
 
 // ─────────────────────────────────────────────
 //  SUPABASE HELPERS
 // ─────────────────────────────────────────────
 async function dbGetSchedules() {
   try {
-    const res = await fetch(`${SUPABASE_URL}/rest/v1/schedules?select=*`, {
-      headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` }
+    const res = await fetch(`${SUPABASE_URL}/rest/v1/schedules?select=*&order=created_at`, {
+      headers: {
+        'apikey': SUPABASE_KEY,
+        'Authorization': `Bearer ${SUPABASE_KEY}`,
+        'Content-Type': 'application/json'
+      }
     });
+    if (!res.ok) {
+      const err = await res.text();
+      console.error('Supabase GET error:', res.status, err);
+      return [];
+    }
     const data = await res.json();
+    console.log('Loaded schedules:', data);
     return Array.isArray(data) ? data.map(s => ({
       id: s.id, roomId: s.room_id, subject: s.subject,
       days: s.days, start: s.start_time, end: s.end_time
     })) : [];
-  } catch(e) { console.error('Load error:', e); return []; }
+  } catch(e) {
+    console.error('Load error:', e);
+    return [];
+  }
 }
 
 async function dbAddSchedule(s) {
-  const res = await fetch(`${SUPABASE_URL}/rest/v1/schedules`, {
-    method: 'POST',
-    headers: {
-      'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}`,
-      'Content-Type': 'application/json', 'Prefer': 'return=minimal'
-    },
-    body: JSON.stringify({ id: s.id, room_id: s.roomId, subject: s.subject, days: s.days, start_time: s.start, end_time: s.end })
-  });
-  return res.ok;
+  try {
+    const res = await fetch(`${SUPABASE_URL}/rest/v1/schedules`, {
+      method: 'POST',
+      headers: {
+        'apikey': SUPABASE_KEY,
+        'Authorization': `Bearer ${SUPABASE_KEY}`,
+        'Content-Type': 'application/json',
+        'Prefer': 'return=minimal'
+      },
+      body: JSON.stringify({
+        id: s.id, room_id: s.roomId, subject: s.subject,
+        days: s.days, start_time: s.start, end_time: s.end
+      })
+    });
+    if (!res.ok) {
+      const err = await res.text();
+      console.error('Supabase POST error:', res.status, err);
+    }
+    return res.ok;
+  } catch(e) {
+    console.error('Add error:', e);
+    return false;
+  }
 }
 
 async function dbDeleteSchedule(id) {
-  const res = await fetch(`${SUPABASE_URL}/rest/v1/schedules?id=eq.${id}`, {
-    method: 'DELETE',
-    headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` }
-  });
-  return res.ok;
+  try {
+    const res = await fetch(`${SUPABASE_URL}/rest/v1/schedules?id=eq.${id}`, {
+      method: 'DELETE',
+      headers: {
+        'apikey': SUPABASE_KEY,
+        'Authorization': `Bearer ${SUPABASE_KEY}`
+      }
+    });
+    return res.ok;
+  } catch(e) {
+    console.error('Delete error:', e);
+    return false;
+  }
 }
 
 // ─────────────────────────────────────────────
-//  ROOMS — from hansraj.collegett.in
+//  ROOMS
 // ─────────────────────────────────────────────
 let rooms = [
   {id:'A-1',block:'Block A',room:'A-1',cap:84},
